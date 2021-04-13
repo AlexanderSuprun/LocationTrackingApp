@@ -1,0 +1,5 @@
+<resources>
+    <string-array name="settings_entries">
+        <item>Account</item>
+    </string-array>
+</resources>
