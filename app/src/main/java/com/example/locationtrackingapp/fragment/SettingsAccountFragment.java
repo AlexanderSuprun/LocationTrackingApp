@@ -21,8 +21,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.locationtrackingapp.MainViewModel;
 import com.example.locationtrackingapp.R;
-import com.example.locationtrackingapp.model.User;
 import com.example.locationtrackingapp.databinding.FragmentSettingsAccountBinding;
+import com.example.locationtrackingapp.model.User;
 import com.example.locationtrackingapp.utils.Validation;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 
@@ -33,8 +33,10 @@ public class SettingsAccountFragment extends Fragment {
     private FragmentSettingsAccountBinding mBinding;
     private NavController mNavController;
     private MainViewModel mViewModel;
-    private User mLoggedInUser;
+    private int mLoggedUserPasswordHash;
+    private int mLoggedUserId;
     private String mImageUri;
+    private Validation mValidation;
 
     public SettingsAccountFragment() {
         // Required empty public constructor
@@ -43,6 +45,7 @@ public class SettingsAccountFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mValidation = new Validation();
     }
 
     @Override
@@ -59,15 +62,18 @@ public class SettingsAccountFragment extends Fragment {
         ((Toolbar) mBinding.toolbar.getRoot()).setNavigationOnClickListener(v -> requireActivity().onBackPressed());
         mNavController = Navigation.findNavController(view);
         mViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
-        mLoggedInUser = mViewModel.getLoggedInUser();
-        mImageUri = mLoggedInUser.getImageUri();
-        mBinding.editTextName.setText(mLoggedInUser.getName());
-        mBinding.editTextSurname.setText(mLoggedInUser.getSurname());
-        mBinding.editTextUsername.setText(mLoggedInUser.getUsername());
-        Glide.with(this)
-                .load(mImageUri)
-                .apply(new RequestOptions().circleCrop())
-                .into(mBinding.imageButtonPickImage);
+        mViewModel.getLoggedInUser().observe(getViewLifecycleOwner(), user -> {
+            mLoggedUserId = user.id;
+            mLoggedUserPasswordHash = user.getPasswordHash();
+            mImageUri = user.getImageUri();
+            mBinding.editTextName.setText(user.getName());
+            mBinding.editTextSurname.setText(user.getSurname());
+            mBinding.editTextUsername.setText(user.getUsername());
+            Glide.with(this)
+                    .load(mImageUri)
+                    .apply(new RequestOptions().circleCrop())
+                    .into(mBinding.imageButtonPickImage);
+        });
     }
 
     public void onImagePickClick() {
@@ -85,32 +91,35 @@ public class SettingsAccountFragment extends Fragment {
         } else if (TextUtils.isEmpty(mBinding.editTextUsername.getText())) {
             clearAllErrors();
             mBinding.editTextUsernameLayout.setError(getString(R.string.error_fill_in_all_fields));
+        } else if (!mValidation.isUserNameAvailable(mBinding.editTextUsername.getText().toString(), mLoggedUserId)) {
+            clearAllErrors();
+            mBinding.editTextUsernameLayout.setError(getString(R.string.error_username_taken));
         } else if ((TextUtils.isEmpty(mBinding.editTextPassword.getText())) &&
                 (TextUtils.isEmpty(mBinding.editTextVerifyPassword.getText()))) {
             clearAllErrors();
             mViewModel.updateUser(new User(
                     mImageUri,
-                    mBinding.editTextName.getText().toString(),
-                    mBinding.editTextSurname.getText().toString(),
-                    mBinding.editTextUsername.getText().toString(),
-                    mLoggedInUser.getUsernameAndPasswordHash()));
+                    mBinding.editTextName.getText().toString().trim(),
+                    mBinding.editTextSurname.getText().toString().trim(),
+                    mBinding.editTextUsername.getText().toString().trim(),
+                    mLoggedUserPasswordHash));
             mNavController.navigateUp();
-        } else if (!mBinding.editTextPassword.getText().toString().equals(mBinding.editTextVerifyPassword.getText().toString())) {
+        } else if (!mBinding.editTextPassword.getText().toString().trim()
+                .equals(mBinding.editTextVerifyPassword.getText().toString().trim())) {
             clearAllErrors();
             mBinding.editTextPasswordLayout.setError(getString(R.string.error_fields_do_not_match));
             mBinding.editTextVerifyPasswordLayout.setError(getString(R.string.error_fields_do_not_match));
-        } else if (!Validation.isPasswordValid(mBinding.editTextPassword.getText().toString())) {
+        } else if (!Validation.isPasswordValid(mBinding.editTextPassword.getText().toString().trim())) {
             clearAllErrors();
             mBinding.editTextPasswordLayout.setError(getString(R.string.error_not_valid_password));
             mBinding.editTextVerifyPasswordLayout.setError(getString(R.string.error_not_valid_password));
         } else {
             mViewModel.updateUser(new User(
                     mImageUri,
-                    mBinding.editTextName.getText().toString(),
-                    mBinding.editTextSurname.getText().toString(),
-                    mBinding.editTextUsername.getText().toString(),
-                    mBinding.editTextUsername.getText().toString().hashCode() +
-                            mBinding.editTextPassword.getText().toString().hashCode()));
+                    mBinding.editTextName.getText().toString().trim(),
+                    mBinding.editTextSurname.getText().toString().trim(),
+                    mBinding.editTextUsername.getText().toString().trim(),
+                    mBinding.editTextPassword.getText().toString().trim().hashCode()));
             mNavController.navigateUp();
         }
     }

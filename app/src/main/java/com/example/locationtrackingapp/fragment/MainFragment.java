@@ -15,17 +15,21 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
-import com.example.authorizationapp.fragment.MainFragmentDirections;
 import com.example.locationtrackingapp.MainActivity;
 import com.example.locationtrackingapp.MainViewModel;
 import com.example.locationtrackingapp.R;
-import com.example.locationtrackingapp.model.User;
 import com.example.locationtrackingapp.databinding.FragmentMainBinding;
 import com.example.locationtrackingapp.databinding.NavHeaderBinding;
+import com.example.locationtrackingapp.model.LocationPoint;
+import com.example.locationtrackingapp.utils.LocationRecyclerAdapter;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * MainFragment with DrawerLayout.
@@ -36,6 +40,7 @@ public class MainFragment extends Fragment {
     private NavController mNavController;
     private MainViewModel mViewModel;
     private ActionBarDrawerToggle mDrawerToggle;
+    private List<LocationPoint> mSavedLocations;
 
     public MainFragment() {
         // Required empty public constructor
@@ -44,6 +49,7 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mSavedLocations = new ArrayList<>();
     }
 
     @Override
@@ -56,15 +62,31 @@ public class MainFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        LocationRecyclerAdapter adapter = new LocationRecyclerAdapter(mSavedLocations, getContext());
         mNavController = Navigation.findNavController(view);
-        mViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
-        User loggedInUser = mViewModel.getLoggedInUser();
         NavHeaderBinding mNavHeaderBinding = NavHeaderBinding.bind(mBinding.navigationView.getHeaderView(0));
-        mNavHeaderBinding.setUser(loggedInUser);
-        Glide.with(this)
-                .load(loggedInUser.getImageUri())
-                .centerCrop()
-                .into(mNavHeaderBinding.imageView);
+        mViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
+
+        mBinding.recyclerView.setLayoutManager(layoutManager);
+        mBinding.recyclerView.setAdapter(adapter);
+
+        mViewModel.getLoggedInUser().observe(getViewLifecycleOwner(), user -> {
+            mNavHeaderBinding.setUser(user);
+            Glide.with(this)
+                    .load(user.getImageUri())
+                    .centerCrop()
+                    .into(mNavHeaderBinding.imageView);
+        });
+
+        mViewModel.getSavedLocations().observe(getViewLifecycleOwner(), userWithLocations ->
+                mSavedLocations.addAll(userWithLocations.get(0).locations));
+
+        mViewModel.getLocationPoint().observe(getViewLifecycleOwner(), locationPoint -> {
+            mSavedLocations.add(locationPoint);
+            adapter.notifyItemInserted(adapter.getItemCount());
+            layoutManager.scrollToPosition(adapter.getItemCount());
+        });
 
         mDrawerToggle = new ActionBarDrawerToggle(requireActivity(), mBinding.drawerLayout,
                 (Toolbar) mBinding.toolbar.getRoot(), R.string.open_drawer, R.string.closed_drawer);
@@ -75,6 +97,7 @@ public class MainFragment extends Fragment {
             if (item.getItemId() == R.id.item_drawer_menu_settings) {
                 mNavController.navigate(MainFragmentDirections.actionMainFragmentToSettingsFragment());
             } else if (item.getItemId() == R.id.item_drawer_menu_exit) {
+                mViewModel.stopWorkManager();
                 mNavController.navigate(MainFragmentDirections.actionMainFragmentToLoginFragment());
             }
             item.setChecked(true);
@@ -84,10 +107,15 @@ public class MainFragment extends Fragment {
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        ((MainActivity) requireActivity()).saveNavigation(mNavController.saveState());
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         mBinding.navigationView.setCheckedItem(R.id.item_drawer_menu_main);
-        ((MainActivity) requireActivity()).saveNavigation(mNavController.saveState());
     }
 
     @Override

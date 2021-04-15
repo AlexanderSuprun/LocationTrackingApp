@@ -1,12 +1,15 @@
 package com.example.locationtrackingapp.model;
 
+import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import org.jetbrains.annotations.NotNull;
 
+@Entity(tableName = "location_points")
 public class LocationPoint {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
+    public int locationId;
     private int userId;
     private double longitude;
     private double latitude;
@@ -15,14 +18,6 @@ public class LocationPoint {
         this.userId = userId;
         this.longitude = longitude;
         this.latitude = latitude;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
     }
 
     public double getLongitude() {
@@ -41,6 +36,14 @@ public class LocationPoint {
         this.latitude = latitude;
     }
 
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -48,6 +51,7 @@ public class LocationPoint {
 
         LocationPoint that = (LocationPoint) o;
 
+        if (locationId != that.locationId) return false;
         if (userId != that.userId) return false;
         if (Double.compare(that.longitude, longitude) != 0) return false;
         return Double.compare(that.latitude, latitude) == 0;
@@ -57,7 +61,8 @@ public class LocationPoint {
     public int hashCode() {
         int result;
         long temp;
-        result = userId;
+        result = locationId;
+        result = 31 * result + userId;
         temp = Double.doubleToLongBits(longitude);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(latitude);
@@ -69,7 +74,8 @@ public class LocationPoint {
     @Override
     public String toString() {
         return "LocationPoint{" +
-                "userId=" + userId +
+                "locationId=" + locationId +
+                ", userId=" + userId +
                 ", longitude=" + longitude +
                 ", latitude=" + latitude +
                 '}';

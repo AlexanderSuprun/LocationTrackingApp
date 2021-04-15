@@ -13,7 +13,6 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
-import com.example.authorizationapp.fragment.SettingsFragmentDirections;
 import com.example.locationtrackingapp.R;
 import com.example.locationtrackingapp.databinding.FragmentSettingsBinding;
 

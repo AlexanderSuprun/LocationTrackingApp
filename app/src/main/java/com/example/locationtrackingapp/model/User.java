@@ -1,45 +1,28 @@
 package com.example.locationtrackingapp.model;
 
 import androidx.room.Entity;
-import androidx.room.Ignore;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import org.jetbrains.annotations.NotNull;
 
-@Entity
+@Entity(indices = {@Index(value = {"username"}, unique = true)})
 public class User {
 
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    public int id;
     private String imageUri;
     private String name;
     private String surname;
     private String username;
-    private int usernameAndPasswordHash;
+    private int passwordHash;
 
-    public User(int id, String imageUri, String name, String surname, String username, int usernameAndPasswordHash) {
-        this.id = id;
+    public User(String imageUri, String name, String surname, String username, int passwordHash) {
         this.imageUri = imageUri;
         this.name = name;
         this.surname = surname;
         this.username = username;
-        this.usernameAndPasswordHash = usernameAndPasswordHash;
-    }
-
-    /**
-     * @param imageUri                Uri to profile image.
-     * @param name                    person's name.
-     * @param surname                 person's surname.
-     * @param username                profile username.
-     * @param usernameAndPasswordHash sum of hash codes of username and password.
-     */
-    @Ignore
-    public User(String imageUri, String name, String surname, String username, int usernameAndPasswordHash) {
-        this.imageUri = imageUri;
-        this.name = name;
-        this.surname = surname;
-        this.username = username;
-        this.usernameAndPasswordHash = usernameAndPasswordHash;
+        this.passwordHash = passwordHash;
     }
 
     public String getImageUri() {
@@ -74,20 +57,12 @@ public class User {
         this.username = username;
     }
 
-    public int getUsernameAndPasswordHash() {
-        return usernameAndPasswordHash;
+    public int getPasswordHash() {
+        return passwordHash;
     }
 
-    public void setUsernameAndPasswordHash(int usernameAndPasswordHash) {
-        this.usernameAndPasswordHash = usernameAndPasswordHash;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public void setPasswordHash(int passwordHash) {
+        this.passwordHash = passwordHash;
     }
 
     @Override
@@ -98,7 +73,7 @@ public class User {
         User user = (User) o;
 
         if (id != user.id) return false;
-        if (usernameAndPasswordHash != user.usernameAndPasswordHash) return false;
+        if (passwordHash != user.passwordHash) return false;
         if (!imageUri.equals(user.imageUri)) return false;
         if (!name.equals(user.name)) return false;
         if (!surname.equals(user.surname)) return false;
@@ -112,7 +87,7 @@ public class User {
         result = 31 * result + name.hashCode();
         result = 31 * result + surname.hashCode();
         result = 31 * result + username.hashCode();
-        result = 31 * result + usernameAndPasswordHash;
+        result = 31 * result + passwordHash;
         return result;
     }
 
@@ -125,7 +100,7 @@ public class User {
                 ", name='" + name + '\'' +
                 ", surname='" + surname + '\'' +
                 ", username='" + username + '\'' +
-                ", usernameAndPasswordHash=" + usernameAndPasswordHash +
+                ", usernameAndPasswordHash=" + passwordHash +
                 '}';
     }
 }

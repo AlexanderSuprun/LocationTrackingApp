@@ -29,4 +29,9 @@
     <string name="select_profile_picture">Please select profile picture</string>
     <string name="error_username_taken">This username is already taken</string>
     <string name="title_account_settings">Account settings</string>
+    <string name="value_latitude">Latitude: %f</string>
+    <string name="value_longitude">Longitude: %f</string>
+    <string name="button_title_allow">Allow</string>
+    <string name="button_title_cancel">Cancel</string>
+    <string name="rationale_message">Allow positioning by GPS to find your location</string>
 </resources>

@@ -19,11 +19,10 @@ import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.authorizationapp.fragment.RegistrationFragmentDirections;
 import com.example.locationtrackingapp.MainViewModel;
 import com.example.locationtrackingapp.R;
-import com.example.locationtrackingapp.model.User;
 import com.example.locationtrackingapp.databinding.FragmentRegistrationBinding;
+import com.example.locationtrackingapp.model.User;
 import com.example.locationtrackingapp.utils.Validation;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.snackbar.Snackbar;
@@ -36,7 +35,7 @@ public class RegistrationFragment extends Fragment {
     private MainViewModel mViewModel;
     private NavController mNavController;
     private String mImageUri;
-    private PrefsManager mPrefsManager;
+    private Validation mValidation;
 
     public RegistrationFragment() {
         // Required empty public constructor
@@ -45,7 +44,7 @@ public class RegistrationFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPrefsManager = new PrefsManager();
+        mValidation = new Validation();
     }
 
     @Override
@@ -85,7 +84,7 @@ public class RegistrationFragment extends Fragment {
             clearAllErrors();
             mBinding.editTextPasswordLayout.setError(getString(R.string.error_fill_in_all_fields));
         } else if (TextUtils.isEmpty(mBinding.editTextVerifyPassword.getText())
-                || !mBinding.editTextPassword.getText().toString().equals(mBinding.editTextVerifyPassword.getText().toString())) {
+                || !mBinding.editTextPassword.getText().toString().trim().equals(mBinding.editTextVerifyPassword.getText().toString().trim())) {
             clearAllErrors();
             mBinding.editTextPasswordLayout.setError(getString(R.string.error_fields_do_not_match));
             mBinding.editTextVerifyPasswordLayout.setError(getString(R.string.error_fields_do_not_match));
@@ -95,18 +94,17 @@ public class RegistrationFragment extends Fragment {
             mBinding.editTextVerifyPasswordLayout.setError(getString(R.string.error_not_valid_password));
         } else if (mImageUri == null) {
             clearAllErrors();
-            Snackbar.make(getView(), getString(R.string.select_profile_picture), Snackbar.LENGTH_SHORT).show();
-        } else if (!new Validation().isUserNameAvailable(mBinding.editTextUsername.getText().toString())) {
+            Snackbar.make(requireView(), getString(R.string.select_profile_picture), Snackbar.LENGTH_SHORT).show();
+        } else if (!mValidation.isUserNameAvailable(mBinding.editTextUsername.getText().toString().trim())) {
             clearAllErrors();
             mBinding.editTextUsernameLayout.setError(getString(R.string.error_username_taken));
         } else {
             mViewModel.saveUser(new User(
                     mImageUri,
-                    mBinding.editTextName.getText().toString(),
-                    mBinding.editTextSurname.getText().toString(),
-                    mBinding.editTextUsername.getText().toString(),
-                    mBinding.editTextUsername.getText().toString().hashCode() +
-                            mBinding.editTextPassword.getText().toString().hashCode()));
+                    mBinding.editTextName.getText().toString().trim(),
+                    mBinding.editTextSurname.getText().toString().trim(),
+                    mBinding.editTextUsername.getText().toString().trim(),
+                    mBinding.editTextPassword.getText().toString().trim().hashCode()));
             mNavController.navigate(RegistrationFragmentDirections.actionRegistrationFragmentToMainFragment());
         }
     }

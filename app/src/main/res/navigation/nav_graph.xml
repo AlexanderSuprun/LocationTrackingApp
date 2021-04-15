@@ -6,9 +6,9 @@
     app:startDestination="@id/loginFragment">
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.example.authorizationapp.fragment.LoginFragment"
+        android:name="com.example.locationtrackingapp.fragment.LoginFragment"
         android:label="fragment_login"
-        tools:layout="@layout/fragment_login" >
+        tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_loginFragment_to_registrationFragment"
             app:destination="@id/registrationFragment" />
@@ -20,9 +20,9 @@
     </fragment>
     <fragment
         android:id="@+id/registrationFragment"
-        android:name="com.example.authorizationapp.fragment.RegistrationFragment"
+        android:name="com.example.locationtrackingapp.fragment.RegistrationFragment"
         android:label="fragment_registration"
-        tools:layout="@layout/fragment_registration" >
+        tools:layout="@layout/fragment_registration">
         <action
             android:id="@+id/action_registrationFragment_to_mainFragment"
             app:destination="@id/mainFragment"
@@ -31,9 +31,9 @@
     </fragment>
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.example.authorizationapp.fragment.MainFragment"
+        android:name="com.example.locationtrackingapp.fragment.MainFragment"
         android:label="fragment_main"
-        tools:layout="@layout/fragment_main" >
+        tools:layout="@layout/fragment_main">
         <action
             android:id="@+id/action_mainFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
@@ -45,14 +45,14 @@
     </fragment>
     <fragment
         android:id="@+id/settingsAccountFragment"
-        android:name="com.example.authorizationapp.fragment.SettingsAccountFragment"
+        android:name="com.example.locationtrackingapp.fragment.SettingsAccountFragment"
         android:label="fragment_settings_account"
         tools:layout="@layout/fragment_settings_account" />
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.example.authorizationapp.fragment.SettingsFragment"
+        android:name="com.example.locationtrackingapp.fragment.SettingsFragment"
         android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings" >
+        tools:layout="@layout/fragment_settings">
         <action
             android:id="@+id/action_settingsFragment2_to_settingsAccountFragment"
             app:destination="@id/settingsAccountFragment" />

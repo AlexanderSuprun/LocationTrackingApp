@@ -14,13 +14,14 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.room.Entity;
 
-import com.example.authorizationapp.fragment.LoginFragmentDirections;
+import com.example.locationtrackingapp.MainActivity;
 import com.example.locationtrackingapp.MainViewModel;
 import com.example.locationtrackingapp.R;
 import com.example.locationtrackingapp.databinding.FragmentLoginBinding;
 import com.example.locationtrackingapp.utils.KeyboardUtils;
 
 import org.jetbrains.annotations.NotNull;
+
 @Entity
 public class LoginFragment extends Fragment {
 
@@ -60,14 +61,19 @@ public class LoginFragment extends Fragment {
             mBinding.editTextUsernameLayout.setError(null);
             mBinding.editTextPasswordLayout.setError(getString(R.string.error_fill_in_all_fields));
         } else {
-            if (mViewModel.validateSignIn(mBinding.editTextUsername.getText().toString(),
-                    mBinding.editTextPassword.getText().toString())) {
-                KeyboardUtils.hide(requireActivity());
-                mNavController.navigate(LoginFragmentDirections.actionLoginFragmentToMainFragment());
-            } else {
-                mBinding.editTextUsernameLayout.setError(getString(R.string.error_invalid_username_or_password));
-                mBinding.editTextPasswordLayout.setError(getString(R.string.error_invalid_username_or_password));
-            }
+            mViewModel.findUser(mBinding.editTextUsername.getText().toString().trim(), mBinding.editTextPassword.getText().toString().trim())
+                    .observe(getViewLifecycleOwner(), user -> {
+                        if (user != null) {
+                            if (((MainActivity) requireActivity()).isPermissionGranted()) {
+                                mViewModel.startWorkManager();
+                            }
+                            KeyboardUtils.hide(requireActivity());
+                            mNavController.navigate(LoginFragmentDirections.actionLoginFragmentToMainFragment());
+                        } else {
+                            mBinding.editTextUsernameLayout.setError(getString(R.string.error_invalid_username_or_password));
+                            mBinding.editTextPasswordLayout.setError(getString(R.string.error_invalid_username_or_password));
+                        }
+                    });
         }
     }
 
