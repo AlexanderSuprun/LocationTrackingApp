@@ -1,7 +1,6 @@
 package com.example.locationtrackingapp;
 
 import android.app.Application;
-import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -9,39 +8,32 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
-import androidx.work.BackoffPolicy;
+import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
-import com.example.locationtrackingapp.database.AppDatabase;
-import com.example.locationtrackingapp.model.LocationPoint;
 import com.example.locationtrackingapp.model.User;
 import com.example.locationtrackingapp.model.UserWithLocations;
 import com.example.locationtrackingapp.utils.LocationWorker;
 
-import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static com.example.locationtrackingapp.utils.LocationWorker.WORKER_OUTPUT_LATITUDE;
-import static com.example.locationtrackingapp.utils.LocationWorker.WORKER_OUTPUT_LONGITUDE;
-import static com.example.locationtrackingapp.utils.LocationWorker.WORKER_TAG;
+import static com.example.locationtrackingapp.utils.LocationWorker.WORKER_NAME;
 
 public class MainViewModel extends AndroidViewModel {
 
+    public static int userIdForWorkManager;
     private final MainRepository mRepository;
-    private final WorkManager mWorkManager;
-    private final MutableLiveData<LocationPoint> mLocationPoint;
     private MutableLiveData<User> mUser;
-    private Observer<List<WorkInfo>> mObserver;
+    private PeriodicWorkRequest mWorkRequest;
+    private LiveData<UserWithLocations> mSavedLocations;
+    private Observer<User> mSavedLocationsObserver;
+    private Observer<User> mManagerObserver;
 
     public MainViewModel(@NonNull Application application) {
         super(application);
         mRepository = new MainRepository();
         mUser = new MutableLiveData<>();
-        mLocationPoint = new MutableLiveData<>();
-        mWorkManager = WorkManager.getInstance(getApplication());
     }
 
     public LiveData<User> findUser(String username, String password) {
@@ -50,8 +42,7 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public void saveUser(User user) {
-        mRepository.saveUser(user);
-        mUser = mRepository.getUser();
+        mUser = mRepository.saveUser(user);
     }
 
     public void updateUser(User user) {
@@ -63,47 +54,28 @@ public class MainViewModel extends AndroidViewModel {
         mRepository.updateUser(mUser.getValue());
     }
 
-    public LiveData<List<UserWithLocations>> getSavedLocations() {
-        return mRepository.getLocationsForUser(Objects.requireNonNull(mUser.getValue()).id);
+    public LiveData<UserWithLocations> getSavedLocations() {
+        mUser.observeForever(mSavedLocationsObserver = user -> {
+            if (user != null) {
+                mSavedLocations = mRepository.getLocationsForUser(user.id);
+            }
+        });
+        return mSavedLocations;
     }
 
     public void startWorkManager() {
-        int period = 15;
-        PeriodicWorkRequest workRequest;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            workRequest = new PeriodicWorkRequest.Builder(LocationWorker.class, period, TimeUnit.MINUTES)
-                    .addTag(WORKER_TAG)
-                    .setBackoffCriteria(
-                            BackoffPolicy.LINEAR,
-                            PeriodicWorkRequest.MIN_BACKOFF_MILLIS,
-                            TimeUnit.MILLISECONDS
-                    )
+        mUser.observeForever(mManagerObserver = user -> {
+            userIdForWorkManager = user.id;
+            mWorkRequest = new PeriodicWorkRequest.Builder(LocationWorker.class,
+                    15, TimeUnit.MINUTES)
                     .build();
-        } else {
-            workRequest = new PeriodicWorkRequest.Builder(LocationWorker.class, period, TimeUnit.MINUTES)
-                    .addTag(WORKER_TAG)
-                    .build();
-        }
-        mWorkManager.enqueue(workRequest);
-        mWorkManager.getWorkInfosByTagLiveData(WORKER_TAG)
-                .observeForever(mObserver = workInfos -> {
-                    Log.i("TAG_VM_WORK", "WorkInfos size:" + workInfos.size());
-                    if (workInfos.get(0) != null && workInfos.get(0).getState() == WorkInfo.State.SUCCEEDED) {
-                        mLocationPoint.setValue(new LocationPoint(
-                                Objects.requireNonNull(mUser.getValue()).id,
-                                workInfos.get(0).getOutputData().getDouble(WORKER_OUTPUT_LONGITUDE, 0),
-                                workInfos.get(0).getOutputData().getDouble(WORKER_OUTPUT_LATITUDE, 0)));
-                    }
-                });
+            WorkManager.getInstance(getApplication())
+                    .enqueueUniquePeriodicWork(WORKER_NAME, ExistingPeriodicWorkPolicy.REPLACE, mWorkRequest);
+        });
     }
 
     public void stopWorkManager() {
-        mWorkManager.getWorkInfosByTagLiveData(WORKER_TAG).removeObserver(mObserver);
-        mWorkManager.cancelAllWorkByTag(WORKER_TAG);
-    }
-
-    public LiveData<LocationPoint> getLocationPoint() {
-        return mLocationPoint;
+        WorkManager.getInstance(getApplication()).cancelUniqueWork(WORKER_NAME);
     }
 
     public LiveData<User> getLoggedInUser() {
@@ -113,5 +85,7 @@ public class MainViewModel extends AndroidViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
+        mUser.removeObserver(mManagerObserver);
+        mUser.removeObserver(mSavedLocationsObserver);
     }
 }

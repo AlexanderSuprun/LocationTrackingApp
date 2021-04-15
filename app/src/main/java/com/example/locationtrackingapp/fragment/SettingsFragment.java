@@ -45,7 +45,7 @@ public class SettingsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mNavController = Navigation.findNavController(view);
         ((Toolbar) mBinding.toolbar.getRoot()).setNavigationOnClickListener(v -> requireActivity().onBackPressed());
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireActivity(), R.layout.list_item, getResources().getStringArray(R.array.settings_entries));
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireActivity(), R.layout.settings_list_item, getResources().getStringArray(R.array.settings_entries));
         mBinding.listViewSettings.setAdapter(adapter);
         mBinding.listViewSettings.setOnItemClickListener((parent, view1, position, id) -> {
             if (position == 0) {

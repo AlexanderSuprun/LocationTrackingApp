@@ -7,13 +7,11 @@ import com.example.locationtrackingapp.database.AppDatabase;
 import com.example.locationtrackingapp.model.User;
 import com.example.locationtrackingapp.model.UserWithLocations;
 
-import java.util.List;
-
 public class MainRepository {
 
     private final MutableLiveData<User> mUser;
-    private final MutableLiveData<List<UserWithLocations>> mUserWithLocations;
     private final AppDatabase mDataBase;
+    private LiveData<UserWithLocations> mUserWithLocations;
 
     public MainRepository() {
         mDataBase = AppDatabase.getInstance();
@@ -21,12 +19,13 @@ public class MainRepository {
         mUserWithLocations = new MutableLiveData<>();
     }
 
-    public void saveUser(User user) {
+    public MutableLiveData<User> saveUser(User user) {
         AppDatabase.getExecutors().execute(() -> mDataBase.runInTransaction(() -> {
             mDataBase.userDao().insertUser(user);
             user.id = mDataBase.userDao().getUserByUsername(user.getUsername()).id;
             mUser.postValue(user);
         }));
+        return mUser;
     }
 
     public MutableLiveData<User> getUserByUsernameAndPassword(String username, String password) {
@@ -40,9 +39,9 @@ public class MainRepository {
                 mDataBase.userDao().updateUser(user));
     }
 
-    public LiveData<List<UserWithLocations>> getLocationsForUser(int id) {
+    public LiveData<UserWithLocations> getLocationsForUser(int id) {
         AppDatabase.getExecutors().execute(() ->
-                mUserWithLocations.postValue(mDataBase.userDao().getLocationsForUser(id)));
+                mUserWithLocations = mDataBase.userDao().getLocationsForUser(id));
         return mUserWithLocations;
     }
 

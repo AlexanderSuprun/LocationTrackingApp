@@ -19,6 +19,7 @@ import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.locationtrackingapp.MainActivity;
 import com.example.locationtrackingapp.MainViewModel;
 import com.example.locationtrackingapp.R;
 import com.example.locationtrackingapp.databinding.FragmentRegistrationBinding;
@@ -65,8 +66,6 @@ public class RegistrationFragment extends Fragment {
 
     public void onImagePickClick() {
         ImagePicker.Companion.with(this)
-//                .cropSquare() //Crop square image
-//                .maxResultSize(640, 640)
                 .start();
     }
 
@@ -105,6 +104,9 @@ public class RegistrationFragment extends Fragment {
                     mBinding.editTextSurname.getText().toString().trim(),
                     mBinding.editTextUsername.getText().toString().trim(),
                     mBinding.editTextPassword.getText().toString().trim().hashCode()));
+            if (((MainActivity) requireActivity()).isPermissionGranted()) {
+                mViewModel.startWorkManager();
+            }
             mNavController.navigate(RegistrationFragmentDirections.actionRegistrationFragmentToMainFragment());
         }
     }

@@ -1,7 +1,5 @@
 package com.example.locationtrackingapp.utils;
 
-import android.util.Log;
-
 import com.example.locationtrackingapp.database.AppDatabase;
 import com.example.locationtrackingapp.model.User;
 
@@ -12,7 +10,7 @@ import java.util.regex.Pattern;
 public class Validation {
 
     private static final String regex = "^(?=.*\\d)(?=.*[a-zA-Z]).{8,20}$";
-    private AppDatabase mDatabase;
+    private final AppDatabase mDatabase;
     private List<User> userList;
 
     public Validation() {
@@ -34,7 +32,6 @@ public class Validation {
      */
 
     public boolean isUserNameAvailable(String username) {
-        Log.i("TAG_VALIDATION", "userList size: " + userList.size());
         for (User user : userList) {
             if (user.getUsername().equals(username)) {
                 return false;
@@ -52,7 +49,6 @@ public class Validation {
      * @return true if username is available.
      */
     public boolean isUserNameAvailable(String username, int userId) {
-        Log.i("TAG_VALIDATION", "userList size: " + userList.size());
         for (User user : userList) {
             if (user.getUsername().equals(username) && user.id != userId) {
                 return false;

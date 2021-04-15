@@ -2,6 +2,7 @@ package com.example.locationtrackingapp.fragment;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -24,6 +26,7 @@ import com.example.locationtrackingapp.R;
 import com.example.locationtrackingapp.databinding.FragmentMainBinding;
 import com.example.locationtrackingapp.databinding.NavHeaderBinding;
 import com.example.locationtrackingapp.model.LocationPoint;
+import com.example.locationtrackingapp.model.UserWithLocations;
 import com.example.locationtrackingapp.utils.LocationRecyclerAdapter;
 
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +44,7 @@ public class MainFragment extends Fragment {
     private MainViewModel mViewModel;
     private ActionBarDrawerToggle mDrawerToggle;
     private List<LocationPoint> mSavedLocations;
+
 
     public MainFragment() {
         // Required empty public constructor
@@ -62,14 +66,21 @@ public class MainFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        LocationRecyclerAdapter adapter = new LocationRecyclerAdapter(mSavedLocations, getContext());
+        LocationRecyclerAdapter adapter = new LocationRecyclerAdapter(mSavedLocations);
         mNavController = Navigation.findNavController(view);
         NavHeaderBinding mNavHeaderBinding = NavHeaderBinding.bind(mBinding.navigationView.getHeaderView(0));
-        mViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
         mBinding.recyclerView.setLayoutManager(layoutManager);
         mBinding.recyclerView.setAdapter(adapter);
+
+        mViewModel.getSavedLocations().observeForever(userWithLocations -> {
+            mSavedLocations.clear();
+            mSavedLocations.addAll(userWithLocations.locations);
+            adapter.notifyDataSetChanged();
+            layoutManager.scrollToPosition(adapter.getItemCount() - 1);
+        });
 
         mViewModel.getLoggedInUser().observe(getViewLifecycleOwner(), user -> {
             mNavHeaderBinding.setUser(user);
@@ -79,15 +90,6 @@ public class MainFragment extends Fragment {
                     .into(mNavHeaderBinding.imageView);
         });
 
-        mViewModel.getSavedLocations().observe(getViewLifecycleOwner(), userWithLocations ->
-                mSavedLocations.addAll(userWithLocations.get(0).locations));
-
-        mViewModel.getLocationPoint().observe(getViewLifecycleOwner(), locationPoint -> {
-            mSavedLocations.add(locationPoint);
-            adapter.notifyItemInserted(adapter.getItemCount());
-            layoutManager.scrollToPosition(adapter.getItemCount());
-        });
-
         mDrawerToggle = new ActionBarDrawerToggle(requireActivity(), mBinding.drawerLayout,
                 (Toolbar) mBinding.toolbar.getRoot(), R.string.open_drawer, R.string.closed_drawer);
         mDrawerToggle.setDrawerIndicatorEnabled(true);
@@ -95,6 +97,8 @@ public class MainFragment extends Fragment {
         mBinding.drawerLayout.addDrawerListener(mDrawerToggle);
         mBinding.navigationView.setNavigationItemSelectedListener(item -> {
             if (item.getItemId() == R.id.item_drawer_menu_settings) {
+                item.setChecked(true);
+                mBinding.drawerLayout.closeDrawers();
                 mNavController.navigate(MainFragmentDirections.actionMainFragmentToSettingsFragment());
             } else if (item.getItemId() == R.id.item_drawer_menu_exit) {
                 mViewModel.stopWorkManager();
@@ -133,5 +137,11 @@ public class MainFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         mBinding = null;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mViewModel.stopWorkManager();
     }
 }

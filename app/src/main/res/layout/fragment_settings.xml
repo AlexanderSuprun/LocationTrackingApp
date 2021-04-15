@@ -22,6 +22,6 @@
             android:dividerHeight="2dp"
             android:entries="@array/settings_entries"
             tools:context=".fragment.SettingsFragment"
-            tools:listitem="@layout/list_item" />
+            tools:listitem="@layout/settings_list_item" />
     </LinearLayout>
 </layout>

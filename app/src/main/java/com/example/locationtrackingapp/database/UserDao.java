@@ -27,7 +27,7 @@ public interface UserDao {
 
     @Transaction
     @Query("SELECT * FROM user WHERE id = :id")
-    List<UserWithLocations> getLocationsForUser(int id);
+    LiveData<UserWithLocations> getLocationsForUser(int id);
 
     @Query("SELECT id, username FROM user WHERE username LIKE :username")
     UserIdAndUsername getUserByUsername(String username);

@@ -67,7 +67,7 @@ public class LoginFragment extends Fragment {
                             if (((MainActivity) requireActivity()).isPermissionGranted()) {
                                 mViewModel.startWorkManager();
                             }
-                            KeyboardUtils.hide(requireActivity());
+                            KeyboardUtils.hide(requireView());
                             mNavController.navigate(LoginFragmentDirections.actionLoginFragmentToMainFragment());
                         } else {
                             mBinding.editTextUsernameLayout.setError(getString(R.string.error_invalid_username_or_password));

@@ -2,27 +2,27 @@ package com.example.locationtrackingapp.utils;
 
 import android.content.Context;
 import android.location.LocationManager;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.location.LocationManagerCompat;
-import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.example.locationtrackingapp.database.AppDatabase;
+import com.example.locationtrackingapp.model.LocationPoint;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.CancellationTokenSource;
 
+import static com.example.locationtrackingapp.MainViewModel.userIdForWorkManager;
+
 
 public class LocationWorker extends Worker {
 
-    public static final String WORKER_TAG = "com.example.locationtrackingapp.WORKER_TAG";
-    public static final String WORKER_OUTPUT_LONGITUDE = "com.example.locationtrackingapp.WORKER_OUTPUT_LONGITUDE";
-    public static final String WORKER_OUTPUT_LATITUDE = "com.example.locationtrackingapp.WORKER_OUTPUT_LATITUDE";
+    public static final String WORKER_NAME = "com.example.locationtrackingapp.WORKER_NAME";
     private final Context mContext;
     private final CancellationTokenSource mCancellationToken;
-    private double mLongitude;
-    private double mLatitude;
 
     public LocationWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -38,18 +38,23 @@ public class LocationWorker extends Worker {
                 LocationServices.getFusedLocationProviderClient(mContext)
                         .getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, mCancellationToken.getToken())
                         .addOnSuccessListener(location -> {
-                            mLatitude = location.getLatitude();
-                            mLongitude = location.getLongitude();
+                            if (userIdForWorkManager != 0) {
+                                AppDatabase.getExecutors().execute(() -> AppDatabase.getInstance().userDao().insertLocation(
+                                        new LocationPoint(userIdForWorkManager, location.getLongitude(), location.getLatitude())));
+                            }
                         });
             } catch (SecurityException e) {
                 e.printStackTrace();
             }
-            return Result.success(new Data.Builder()
-                    .putDouble(WORKER_OUTPUT_LATITUDE, mLatitude)
-                    .putDouble(WORKER_OUTPUT_LONGITUDE, mLongitude)
-                    .build());
+            return Result.success();
         } else {
-            return Result.retry();
+            return Result.failure();
         }
+    }
+
+    @Override
+    public void onStopped() {
+        super.onStopped();
+        mCancellationToken.cancel();
     }
 }

@@ -30,7 +30,6 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public static synchronized AppDatabase getInstance() {
         if (sDatabase == null) {
-            Log.i("TAG_DB", "Database created");
             sDatabase = Room.databaseBuilder(LocationTrackingApp.getAppContext(), AppDatabase.class, DATABASE_NAME)
                     .addMigrations(MIGRATION_1_2)
                     .build();
@@ -40,7 +39,6 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public static Executor getExecutors() {
         if (sExecutor == null) {
-            Log.i("TAG_DB", "Executors created");
             sExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
         }
         return sExecutor;

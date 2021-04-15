@@ -10,6 +10,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.locationtrackingapp.R;
+import com.example.locationtrackingapp.app.LocationTrackingApp;
 import com.example.locationtrackingapp.model.LocationPoint;
 
 import java.util.ArrayList;
@@ -17,12 +18,12 @@ import java.util.List;
 
 public class LocationRecyclerAdapter extends RecyclerView.Adapter<LocationRecyclerAdapter.ViewHolder> {
 
-    private final ArrayList<LocationPoint> locationPoints;
-    private final Context context;
+    private final ArrayList<LocationPoint> mLocationPoints;
+    private final Context mContext;
 
-    public LocationRecyclerAdapter(List<LocationPoint> points, Context context) {
-        this.locationPoints = (ArrayList<LocationPoint>) points;
-        this.context = context;
+    public LocationRecyclerAdapter(List<LocationPoint> points) {
+        this.mLocationPoints = (ArrayList<LocationPoint>) points;
+        this.mContext = LocationTrackingApp.getAppContext();
     }
 
     @NonNull
@@ -34,14 +35,14 @@ public class LocationRecyclerAdapter extends RecyclerView.Adapter<LocationRecycl
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        LocationPoint point = locationPoints.get(position);
-        holder.textViewLongitude.setText(context.getString(R.string.value_longitude, point.getLongitude()));
-        holder.textViewLatitude.setText(context.getString(R.string.value_latitude, point.getLatitude()));
+        LocationPoint point = mLocationPoints.get(position);
+        holder.textViewLongitude.setText(mContext.getString(R.string.value_longitude, point.getLongitude()));
+        holder.textViewLatitude.setText(mContext.getString(R.string.value_latitude, point.getLatitude()));
     }
 
     @Override
     public int getItemCount() {
-        return locationPoints.size();
+        return mLocationPoints.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
