@@ -14,8 +14,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.example.locationtrackingapp.database.AppDatabase;
-
 public class MainActivity extends AppCompatActivity {
 
     public static final int LOCATION_REQUEST_CODE = 100;

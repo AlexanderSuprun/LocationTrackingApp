@@ -2,7 +2,6 @@ package com.example.locationtrackingapp.utils;
 
 import android.content.Context;
 import android.location.LocationManager;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.location.LocationManagerCompat;

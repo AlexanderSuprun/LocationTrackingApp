@@ -2,7 +2,6 @@ package com.example.locationtrackingapp.fragment;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,7 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -26,7 +24,6 @@ import com.example.locationtrackingapp.R;
 import com.example.locationtrackingapp.databinding.FragmentMainBinding;
 import com.example.locationtrackingapp.databinding.NavHeaderBinding;
 import com.example.locationtrackingapp.model.LocationPoint;
-import com.example.locationtrackingapp.model.UserWithLocations;
 import com.example.locationtrackingapp.utils.LocationRecyclerAdapter;
 
 import org.jetbrains.annotations.NotNull;

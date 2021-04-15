@@ -1,7 +1,5 @@
 package com.example.locationtrackingapp.database;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
@@ -12,8 +10,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import com.example.locationtrackingapp.app.LocationTrackingApp;
 import com.example.locationtrackingapp.model.LocationPoint;
 import com.example.locationtrackingapp.model.User;
-import com.example.locationtrackingapp.model.UserIdAndUsername;
-import com.example.locationtrackingapp.model.UserWithLocations;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
