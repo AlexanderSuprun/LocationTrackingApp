@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "662200275421",
+    "project_id": "location-tracking-app-ddc9e",
+    "storage_bucket": "location-tracking-app-ddc9e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:662200275421:android:4d5c00d5a28c5e2c312634",
+        "android_client_info": {
+          "package_name": "com.example.locationtrackingapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "662200275421-d5tlalqbucj65c756lp7tm3u4opm2t8i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAn5xdXGbfy8nsJ4dIh6cYku4L1fB-KI4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "662200275421-d5tlalqbucj65c756lp7tm3u4opm2t8i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -19,6 +19,7 @@ import com.example.locationtrackingapp.MainViewModel;
 import com.example.locationtrackingapp.R;
 import com.example.locationtrackingapp.databinding.FragmentLoginBinding;
 import com.example.locationtrackingapp.utils.KeyboardUtils;
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -51,6 +52,11 @@ public class LoginFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mNavController = Navigation.findNavController(view);
         mViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
     }
 
     public void onSignInClick() {

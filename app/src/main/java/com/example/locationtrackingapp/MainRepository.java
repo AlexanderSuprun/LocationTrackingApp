@@ -1,5 +1,7 @@
 package com.example.locationtrackingapp;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -16,7 +18,7 @@ public class MainRepository {
     public MainRepository() {
         mDataBase = AppDatabase.getInstance();
         mUser = new MutableLiveData<>();
-        mUserWithLocations = new MutableLiveData<>();
+//        mUserWithLocations = new MutableLiveData<>();
     }
 
     public MutableLiveData<User> saveUser(User user) {

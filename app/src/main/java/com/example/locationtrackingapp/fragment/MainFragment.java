@@ -2,6 +2,7 @@ package com.example.locationtrackingapp.fragment;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,13 +24,11 @@ import com.example.locationtrackingapp.MainViewModel;
 import com.example.locationtrackingapp.R;
 import com.example.locationtrackingapp.databinding.FragmentMainBinding;
 import com.example.locationtrackingapp.databinding.NavHeaderBinding;
-import com.example.locationtrackingapp.model.LocationPoint;
 import com.example.locationtrackingapp.utils.LocationRecyclerAdapter;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * MainFragment with DrawerLayout.
@@ -40,7 +39,8 @@ public class MainFragment extends Fragment {
     private NavController mNavController;
     private MainViewModel mViewModel;
     private ActionBarDrawerToggle mDrawerToggle;
-    private List<LocationPoint> mSavedLocations;
+    private LinearLayoutManager layoutManager;
+    private LocationRecyclerAdapter adapter;
 
 
     public MainFragment() {
@@ -50,7 +50,6 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSavedLocations = new ArrayList<>();
     }
 
     @Override
@@ -64,27 +63,29 @@ public class MainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        LocationRecyclerAdapter adapter = new LocationRecyclerAdapter(mSavedLocations);
+        layoutManager = new LinearLayoutManager(getContext());
+        adapter = new LocationRecyclerAdapter(new ArrayList<>());
         mNavController = Navigation.findNavController(view);
         NavHeaderBinding mNavHeaderBinding = NavHeaderBinding.bind(mBinding.navigationView.getHeaderView(0));
 
         mBinding.recyclerView.setLayoutManager(layoutManager);
         mBinding.recyclerView.setAdapter(adapter);
 
-        mViewModel.getSavedLocations().observeForever(userWithLocations -> {
-            mSavedLocations.clear();
-            mSavedLocations.addAll(userWithLocations.locations);
+        mViewModel.getSavedLocations().observe(getViewLifecycleOwner(), userWithLocations -> {
+            Log.i("TAG_DEBUG", "Saved locations observer");
+            adapter.setNewItems(userWithLocations.locations);
             adapter.notifyDataSetChanged();
             layoutManager.scrollToPosition(adapter.getItemCount() - 1);
         });
 
         mViewModel.getLoggedInUser().observe(getViewLifecycleOwner(), user -> {
-            mNavHeaderBinding.setUser(user);
-            Glide.with(this)
-                    .load(user.getImageUri())
-                    .centerCrop()
-                    .into(mNavHeaderBinding.imageView);
+            if (user != null) {
+                mNavHeaderBinding.setUser(user);
+                Glide.with(this)
+                        .load(user.getImageUri())
+                        .centerCrop()
+                        .into(mNavHeaderBinding.imageView);
+            }
         });
 
         mDrawerToggle = new ActionBarDrawerToggle(requireActivity(), mBinding.drawerLayout,
@@ -111,6 +112,11 @@ public class MainFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         ((MainActivity) requireActivity()).saveNavigation(mNavController.saveState());
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
     }
 
     @Override

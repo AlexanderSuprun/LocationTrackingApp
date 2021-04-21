@@ -1,6 +1,7 @@
 package com.example.locationtrackingapp.utils;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +19,8 @@ import java.util.List;
 
 public class LocationRecyclerAdapter extends RecyclerView.Adapter<LocationRecyclerAdapter.ViewHolder> {
 
-    private final ArrayList<LocationPoint> mLocationPoints;
     private final Context mContext;
+    private ArrayList<LocationPoint> mLocationPoints;
 
     public LocationRecyclerAdapter(List<LocationPoint> points) {
         this.mLocationPoints = (ArrayList<LocationPoint>) points;
@@ -43,6 +44,10 @@ public class LocationRecyclerAdapter extends RecyclerView.Adapter<LocationRecycl
     @Override
     public int getItemCount() {
         return mLocationPoints.size();
+    }
+
+    public void setNewItems(List<LocationPoint> locationPoints) {
+        this.mLocationPoints = (ArrayList<LocationPoint>) locationPoints;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
