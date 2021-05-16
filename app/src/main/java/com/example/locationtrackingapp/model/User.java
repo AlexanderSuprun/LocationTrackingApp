@@ -1,28 +1,23 @@
 package com.example.locationtrackingapp.model;
 
-import androidx.room.Entity;
-import androidx.room.Index;
-import androidx.room.PrimaryKey;
+import androidx.annotation.NonNull;
 
-import org.jetbrains.annotations.NotNull;
-
-@Entity(indices = {@Index(value = {"username"}, unique = true)})
 public class User {
 
-    @PrimaryKey(autoGenerate = true)
-    public int id;
+    private String userId;
     private String imageUri;
     private String name;
     private String surname;
-    private String username;
-    private int passwordHash;
+    private String email;
 
-    public User(String imageUri, String name, String surname, String username, int passwordHash) {
+    public User() {
+    }
+
+    public User(String imageUri, String name, String surname, String email) {
         this.imageUri = imageUri;
         this.name = name;
         this.surname = surname;
-        this.username = username;
-        this.passwordHash = passwordHash;
+        this.email = email;
     }
 
     public String getImageUri() {
@@ -49,20 +44,20 @@ public class User {
         this.surname = surname;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public int getPasswordHash() {
-        return passwordHash;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setPasswordHash(int passwordHash) {
-        this.passwordHash = passwordHash;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     @Override
@@ -72,35 +67,33 @@ public class User {
 
         User user = (User) o;
 
-        if (id != user.id) return false;
-        if (passwordHash != user.passwordHash) return false;
+        if (!userId.equals(user.userId)) return false;
         if (!imageUri.equals(user.imageUri)) return false;
         if (!name.equals(user.name)) return false;
         if (!surname.equals(user.surname)) return false;
-        return username.equals(user.username);
+        return email.equals(user.email);
     }
 
     @Override
     public int hashCode() {
-        int result = id;
+        int result = userId.hashCode();
         result = 31 * result + imageUri.hashCode();
         result = 31 * result + name.hashCode();
         result = 31 * result + surname.hashCode();
-        result = 31 * result + username.hashCode();
-        result = 31 * result + passwordHash;
+        result = 31 * result + email.hashCode();
         return result;
     }
 
-    @NotNull
+
+    @NonNull
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
+                "userId='" + userId + '\'' +
                 ", imageUri='" + imageUri + '\'' +
                 ", name='" + name + '\'' +
                 ", surname='" + surname + '\'' +
-                ", username='" + username + '\'' +
-                ", usernameAndPasswordHash=" + passwordHash +
+                ", username='" + email + '\'' +
                 '}';
     }
 }

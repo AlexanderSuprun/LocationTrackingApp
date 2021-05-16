@@ -2,7 +2,6 @@ package com.example.locationtrackingapp.utils;
 
 import android.content.Context;
 import android.location.LocationManager;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.location.LocationManagerCompat;
@@ -20,7 +19,7 @@ import static com.example.locationtrackingapp.MainViewModel.userIdForWorkManager
 
 public class LocationWorker extends Worker {
 
-    public static final String WORKER_NAME = "com.example.locationtrackingapp.WORKER_NAME";
+    public static final String LOCATION_WORKER_NAME = "com.example.locationtrackingapp.LOCATION_WORKER_NAME";
     private final Context mContext;
     private final CancellationTokenSource mCancellationToken;
 
@@ -38,8 +37,8 @@ public class LocationWorker extends Worker {
                 LocationServices.getFusedLocationProviderClient(mContext)
                         .getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, mCancellationToken.getToken())
                         .addOnSuccessListener(location -> {
-                            if (userIdForWorkManager != 0) {
-                                AppDatabase.getExecutors().execute(() -> AppDatabase.getInstance().userDao().insertLocation(
+                            if (userIdForWorkManager != null) {
+                                AppDatabase.getExecutors().execute(() -> AppDatabase.getInstance().locationsDao().insertLocation(
                                         new LocationPoint(userIdForWorkManager, location.getLongitude(), location.getLatitude())));
                             }
                         });

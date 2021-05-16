@@ -2,6 +2,7 @@ package com.example.locationtrackingapp.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -35,8 +36,7 @@ public class RegistrationFragment extends Fragment {
     private FragmentRegistrationBinding mBinding;
     private MainViewModel mViewModel;
     private NavController mNavController;
-    private String mImageUri;
-    private Validation mValidation;
+    private Uri mImageUri;
 
     public RegistrationFragment() {
         // Required empty public constructor
@@ -45,7 +45,6 @@ public class RegistrationFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mValidation = new Validation();
     }
 
     @Override
@@ -76,9 +75,9 @@ public class RegistrationFragment extends Fragment {
         } else if (TextUtils.isEmpty(mBinding.editTextSurname.getText())) {
             clearAllErrors();
             mBinding.editTextSurnameLayout.setError(getString(R.string.error_fill_in_all_fields));
-        } else if (TextUtils.isEmpty(mBinding.editTextUsername.getText())) {
+        } else if (TextUtils.isEmpty(mBinding.editTextEmail.getText())) {
             clearAllErrors();
-            mBinding.editTextUsernameLayout.setError(getString(R.string.error_fill_in_all_fields));
+            mBinding.editTextEmailLayout.setError(getString(R.string.error_fill_in_all_fields));
         } else if (TextUtils.isEmpty(mBinding.editTextPassword.getText())) {
             clearAllErrors();
             mBinding.editTextPasswordLayout.setError(getString(R.string.error_fill_in_all_fields));
@@ -94,19 +93,19 @@ public class RegistrationFragment extends Fragment {
         } else if (mImageUri == null) {
             clearAllErrors();
             Snackbar.make(requireView(), getString(R.string.select_profile_picture), Snackbar.LENGTH_SHORT).show();
-        } else if (!mValidation.isUserNameAvailable(mBinding.editTextUsername.getText().toString().trim())) {
+        } else if (!Validation.isEmailValid(mBinding.editTextEmail.getText().toString().trim())) {
             clearAllErrors();
-            mBinding.editTextUsernameLayout.setError(getString(R.string.error_username_taken));
+            mBinding.editTextEmailLayout.setError(getString(R.string.error_invalid_email));
         } else {
             mViewModel.saveUser(new User(
-                    mImageUri,
+                    null,
                     mBinding.editTextName.getText().toString().trim(),
                     mBinding.editTextSurname.getText().toString().trim(),
-                    mBinding.editTextUsername.getText().toString().trim(),
-                    mBinding.editTextPassword.getText().toString().trim().hashCode()));
-            if (((MainActivity) requireActivity()).isPermissionGranted()) {
-                mViewModel.startWorkManager();
-            }
+                    mBinding.editTextEmail.getText().toString().trim()),
+                    mBinding.editTextPassword.getText().toString().trim(), mImageUri);
+//            if (((MainActivity) requireActivity()).isPermissionGranted()) {
+//                mViewModel.startWorkManager();
+//            }
             mNavController.navigate(RegistrationFragmentDirections.actionRegistrationFragmentToMainFragment());
         }
     }
@@ -115,22 +114,20 @@ public class RegistrationFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK && requestCode == ImagePicker.REQUEST_CODE) {
-            mImageUri = data.getData().toString();
+            mImageUri = data.getData();
             Glide.with(this)
                     .load(mImageUri)
                     .apply(new RequestOptions().circleCrop())
                     .into(mBinding.imageButtonPickImage);
         } else if (resultCode == ImagePicker.RESULT_ERROR) {
             Toast.makeText(requireActivity(), ImagePicker.Companion.getError(data), Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(requireActivity(), R.string.toast_task_cancelled, Toast.LENGTH_SHORT).show();
         }
     }
 
     private void clearAllErrors() {
         mBinding.editTextNameLayout.setError(null);
         mBinding.editTextSurnameLayout.setError(null);
-        mBinding.editTextUsernameLayout.setError(null);
+        mBinding.editTextEmailLayout.setError(null);
         mBinding.editTextPasswordLayout.setError(null);
         mBinding.editTextVerifyPasswordLayout.setError(null);
     }

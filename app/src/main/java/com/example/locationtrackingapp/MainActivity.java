@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -87,8 +86,8 @@ public class MainActivity extends AppCompatActivity {
     private void showMessageRationale() {
         new AlertDialog.Builder(this)
                 .setMessage(R.string.rationale_message)
-                .setPositiveButton(getString(R.string.button_title_allow), (dialog, which) -> requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE))
-                .setNegativeButton(getString(R.string.button_title_cancel), (dialog, which) -> dialog.dismiss())
+                .setPositiveButton(getString(R.string.btn_text_allow), (dialog, which) -> requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE))
+                .setNegativeButton(getString(R.string.btn_text_cancel), (dialog, which) -> dialog.dismiss())
                 .create()
                 .show();
     }

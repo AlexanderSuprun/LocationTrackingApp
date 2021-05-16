@@ -1,5 +1,6 @@
 package com.example.locationtrackingapp.model;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -10,11 +11,11 @@ public class LocationPoint {
 
     @PrimaryKey(autoGenerate = true)
     public int locationId;
-    private int userId;
+    private String userId;
     private double longitude;
     private double latitude;
 
-    public LocationPoint(int userId, double longitude, double latitude) {
+    public LocationPoint(String userId, double longitude, double latitude) {
         this.userId = userId;
         this.longitude = longitude;
         this.latitude = latitude;
@@ -36,11 +37,11 @@ public class LocationPoint {
         this.latitude = latitude;
     }
 
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
@@ -52,9 +53,9 @@ public class LocationPoint {
         LocationPoint that = (LocationPoint) o;
 
         if (locationId != that.locationId) return false;
-        if (userId != that.userId) return false;
         if (Double.compare(that.longitude, longitude) != 0) return false;
-        return Double.compare(that.latitude, latitude) == 0;
+        if (Double.compare(that.latitude, latitude) != 0) return false;
+        return userId.equals(that.userId);
     }
 
     @Override
@@ -62,7 +63,7 @@ public class LocationPoint {
         int result;
         long temp;
         result = locationId;
-        result = 31 * result + userId;
+        result = 31 * result + userId.hashCode();
         temp = Double.doubleToLongBits(longitude);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(latitude);
@@ -70,12 +71,12 @@ public class LocationPoint {
         return result;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String toString() {
         return "LocationPoint{" +
                 "locationId=" + locationId +
-                ", userId=" + userId +
+                ", userId='" + userId + '\'' +
                 ", longitude=" + longitude +
                 ", latitude=" + latitude +
                 '}';

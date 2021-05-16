@@ -1,59 +1,24 @@
 package com.example.locationtrackingapp.utils;
 
-import com.example.locationtrackingapp.database.AppDatabase;
 import com.example.locationtrackingapp.model.User;
 
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Validation {
 
-    private static final String regex = "^(?=.*\\d)(?=.*[a-zA-Z]).{8,20}$";
-    private final AppDatabase mDatabase;
-    private List<User> userList;
-
-    public Validation() {
-        mDatabase = AppDatabase.getInstance();
-        AppDatabase.getExecutors().execute(() -> userList = mDatabase.userDao().getAllUsers());
-    }
+    private static final String PASSWORD_REGEX = "^(?=.*\\d)(?=.*[a-zA-Z]).{8,20}$";
+    private static final String EMAIL_REGEX = "^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
 
     public static boolean isPasswordValid(String password) {
-        Pattern pattern = Pattern.compile(regex);
+        Pattern pattern = Pattern.compile(PASSWORD_REGEX);
         Matcher matcher = pattern.matcher(password);
         return matcher.matches();
     }
 
-    /**
-     * Use this method for registration.
-     *
-     * @param username username to check.
-     * @return true if username is available.
-     */
-
-    public boolean isUserNameAvailable(String username) {
-        for (User user : userList) {
-            if (user.getUsername().equals(username)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Use this method for account settings.
-     *
-     * @param username username to check.
-     * @param userId   user's id.
-     * @return true if username is available.
-     */
-    public boolean isUserNameAvailable(String username, int userId) {
-        for (User user : userList) {
-            if (user.getUsername().equals(username) && user.id != userId) {
-                return false;
-            }
-        }
-        return true;
+    public static boolean isEmailValid(String email) {
+        Pattern pattern = Pattern.compile(EMAIL_REGEX);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
     }
 }

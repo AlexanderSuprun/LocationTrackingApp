@@ -1,12 +1,11 @@
 <resources>
     <string name="app_name">LocationTrackingApp</string>
     <string name="title_registration">Registration</string>
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password</string>
-    <string name="hint_username">Username</string>
+    <string name="hint_email">Email</string>
     <string name="hint_password">Password</string>
     <string name="btn_text_sign_in">Sign in</string>
     <string name="btn_text_sign_up">Sign up</string>
+    <string name="btn_text_ok">@android:string/ok</string>
     <string name="content_desc_pick_image">Pick image</string>
     <string name="hint_name">Name</string>
     <string name="hint_surname">Surname</string>
@@ -20,18 +19,22 @@
     <string name="closed_drawer">Closed drawer</string>
     <string name="error_fill_in_all_fields">Please fill in all fields</string>
     <string name="error_invalid_username_or_password">Invalid username or password</string>
-    <string name="toast_task_cancelled">Task Cancelled</string>
     <string name="error_fields_do_not_match">Fields do not match</string>
     <string name="error_not_valid_password">Password must be at least 8 characters long and contain letters and numbers</string>
     <string name="content_desc_profile_image">Profile image</string>
     <string name="hint_new_password">New password</string>
     <string name="hint_verify_new_password">Verify new password</string>
     <string name="select_profile_picture">Please select profile picture</string>
-    <string name="error_username_taken">This username is already taken</string>
+    <string name="error_invalid_email">Invalid email</string>
     <string name="title_account_settings">Account settings</string>
     <string name="value_latitude">Latitude: %f</string>
     <string name="value_longitude">Longitude: %f</string>
-    <string name="button_title_allow">Allow</string>
-    <string name="button_title_cancel">Cancel</string>
+    <string name="btn_text_allow">ALLOW</string>
+    <string name="btn_text_cancel">@android:string/cancel</string>
     <string name="rationale_message">Allow positioning by GPS to find your location</string>
+    <string name="empty_password_error">Password field cannot be empty</string>
+    <string name="invalid_password_error">Enter valid password</string>
+    <string name="verify_password">Verify your password</string>
+    <string name="enter_old_password">Enter your old password to verify</string>
+
 </resources>

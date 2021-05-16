@@ -15,7 +15,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
@@ -29,6 +31,8 @@ import com.example.locationtrackingapp.utils.LocationRecyclerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+
+import static com.example.locationtrackingapp.fragment.LoginFragment.SIGNED_OUT_FLAG;
 
 /**
  * MainFragment with DrawerLayout.
@@ -71,9 +75,9 @@ public class MainFragment extends Fragment {
         mBinding.recyclerView.setLayoutManager(layoutManager);
         mBinding.recyclerView.setAdapter(adapter);
 
-        mViewModel.getSavedLocations().observe(getViewLifecycleOwner(), userWithLocations -> {
+        mViewModel.getSavedLocations().observe(getViewLifecycleOwner(), locationPoints -> {
             Log.i("TAG_DEBUG", "Saved locations observer");
-            adapter.setNewItems(userWithLocations.locations);
+            adapter.setNewItems(locationPoints);
             adapter.notifyDataSetChanged();
             layoutManager.scrollToPosition(adapter.getItemCount() - 1);
         });
@@ -99,7 +103,7 @@ public class MainFragment extends Fragment {
                 mBinding.drawerLayout.closeDrawers();
                 mNavController.navigate(MainFragmentDirections.actionMainFragmentToSettingsFragment());
             } else if (item.getItemId() == R.id.item_drawer_menu_exit) {
-                mViewModel.stopWorkManager();
+                mViewModel.signOutUser();
                 mNavController.navigate(MainFragmentDirections.actionMainFragmentToLoginFragment());
             }
             item.setChecked(true);
@@ -145,6 +149,6 @@ public class MainFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mViewModel.stopWorkManager();
+//        mViewModel.stopWorkManager();
     }
 }
